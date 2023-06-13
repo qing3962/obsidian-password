@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-password",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "This is a password plugin for protecting your private note and diary, no encrypt, no decrypt.",
 	"main": "main.js",
 	"scripts": {

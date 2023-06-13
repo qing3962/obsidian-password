@@ -1,9 +1,9 @@
 name: Release Obsidian plugin
 
-on: push
-#  push:
-#    tags:
-#      - "*"
+on:
+  push:
+    tags:
+      - "*"
 
 env:
   PLUGIN_NAME: obsidian-password # Change this to match the id of your plugin.
