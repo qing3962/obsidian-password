@@ -1,11 +1,11 @@
 {
 	"id": "obsidian-password",
 	"name": "Obsidian Password",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"minAppVersion": "0.15.0",
-	"description": "This is a password plugin for protecting your private diretorys and files, preventing your buddy to see your private notes.",
+	"description": "This is a password plugin for protecting your private note and diary, no encrypt, no decrypt.",
 	"author": "qing3962",
-	"authorUrl": "https://obsidian.md",
+	"authorUrl": "https://qing3962.github.io/",
 	"fundingUrl": "https://obsidian.md/pricing",
 	"isDesktopOnly": false
 }

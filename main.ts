@@ -398,7 +398,7 @@ class SetPasswordModal extends Modal {
         }
 
         // check the input and confirm
-        const pwChecker = (ev) => {
+        const pwChecker = (ev: Event) => {
             ev.preventDefault();
 
             let goodToGo = pwConfirmChecker();
@@ -421,7 +421,7 @@ class SetPasswordModal extends Modal {
         saveBtnEl.addEventListener('click', pwChecker);
 
         // cancel the modal
-        const cancelEnable = (ev) => {
+        const cancelEnable = (ev: Event) => {
             ev.preventDefault();
             this.close();
         }
@@ -521,7 +521,7 @@ class VerifyPasswordModal extends Modal {
         }
 
         // check the input and confirm
-        const pwChecker = (ev) => {
+        const pwChecker = (ev: Event) => {
             ev.preventDefault();
 
             let goodToGo = pwConfirmChecker();
@@ -538,7 +538,7 @@ class VerifyPasswordModal extends Modal {
         saveBtnEl.addEventListener('click', pwChecker);
 
         // cancel the modal
-        const cancelEnable = (ev) => {
+        const cancelEnable = (ev: Event) => {
             ev.preventDefault();
             this.close();
         }
