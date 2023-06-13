@@ -271,7 +271,7 @@ class PasswordSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .setName(`Enable protecting folder with password.`)
             .setDesc(
-                `A password will be required for either enable or disable the protection.`
+                `A password will be required to enable or disable the protection.`
             )
             .addToggle((toggle) =>
                 toggle
@@ -409,7 +409,6 @@ class SetPasswordModal extends Modal {
             //deal with accents - normalize Unicode
             var password = pwInputEl.value.normalize('NFC');
             const encryptedText = this.plugin.encrypt(password, ENCRYPT_KEY);
-            //console.log(`Encrypted text: ${encryptedText}`);
 
             // if all checks pass, save to settings
             this.plugin.settings.password = encryptedText;
@@ -504,7 +503,6 @@ class VerifyPasswordModal extends Modal {
 
             //deal with accents - normalize Unicode
             var password = pwInputEl.value.normalize('NFC');
-
             const decryptedText = this.plugin.decrypt(this.plugin.settings.password, ENCRYPT_KEY);
             //console.log(`Decrypted text: ${decryptedText}`);
 

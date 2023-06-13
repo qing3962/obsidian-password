@@ -240,7 +240,7 @@ var PasswordSettingTab = class extends import_obsidian.PluginSettingTab {
       this.plugin.settings.protectedPath = path;
     })).setDisabled(this.plugin.settings.protectEnabled);
     new import_obsidian.Setting(containerEl).setName(`Enable protecting folder with password.`).setDesc(
-      `A password will be required for either enable or disable the protection.`
+      `A password will be required to enable or disable the protection.`
     ).addToggle(
       (toggle) => toggle.setValue(this.plugin.settings.protectEnabled).onChange((value) => {
         if (value) {
