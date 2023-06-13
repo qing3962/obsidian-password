@@ -18,56 +18,43 @@ const DEFAULT_SETTINGS: PasswordPluginSettings = {
 
 export default class PasswordPlugin extends Plugin {
     settings: PasswordPluginSettings;
-    isConfirmPasswordWaitting: boolean = false;
-    isConfirmPasswordCorrect: boolean = false;
+    isVerifyPasswordWaitting: boolean = false;
+    isVerifyPasswordCorrect: boolean = false;
 
-    enablePasswordRibbonIcon: HTMLElement;
+    passwordRibbonBtn: HTMLElement;
 
     async onload() {
         await this.loadSettings();
 
         // This creates an icon in the left ribbon.
-        var iconId = 'unlock';
         if (this.settings.protectEnabled) {
-            iconId = 'lock';
+            this.passwordRibbonBtn = this.addRibbonIcon('unlock', 'Close password protection', (evt: MouseEvent) => {
+                this.switchPasswordProtection();
+            });
+        } else {
+            this.passwordRibbonBtn = this.addRibbonIcon('lock', 'Open password protection', (evt: MouseEvent) => {
+                this.switchPasswordProtection();
+            });
         }
-        this.enablePasswordRibbonIcon = this.addRibbonIcon(iconId, 'Enable password protection', (evt: MouseEvent) => {
-            this.EnablePasswordProtection();
-        });
 
         // This adds a simple command that can be triggered anywhere
         this.addCommand({
-            id: 'Obsidian password: Enable password protection',
-            name: 'Enable password protection',
+            id: 'Obsidian password: Open password protection',
+            name: 'Open password protection',
             callback: () => {
-                this.EnablePasswordProtection();
+                this.OpenPasswordProtection();
             }
         });
 
         // This adds a settings tab so the user can configure various aspects of the plugin
         this.addSettingTab(new PasswordSettingTab(this.app, this));
 
-        // open notes
-        const openLeaves = async (file: TFile): Promise<void> => {
-            var leaf = this.app.workspace.getLeaf(false);
-            if (leaf != null) {
-                leaf.openFile(file);
-            }
-        }
-
         // when the layout is ready, check if the root folder need to be protected, if so, close all notes, show the password dialog
         this.app.workspace.onLayoutReady(() => {
             if (this.settings.protectEnabled && this.settings.protectedPath == '/') {
-                if (!this.isConfirmPasswordWaitting && !this.isConfirmPasswordCorrect) {
+                if (!this.isVerifyPasswordCorrect) {
                     this.closeLeaves(null);
-                    const setModal = new ConfirmPasswordModal(this.app, this, () => {
-                        if (!this.isConfirmPasswordCorrect) {
-                            //console.log("isConfirmPasswordCorrect is false");
-                        } else {
-                            setIcon(this.enablePasswordRibbonIcon, "lock");
-                            //console.log("isConfirmPasswordCorrect is true");
-                        }
-                    }).open();
+                    this.ClosePasswordProtection(null);
                 }
             }
         });
@@ -76,29 +63,24 @@ export default class PasswordPlugin extends Plugin {
         this.registerEvent(this.app.workspace.on('file-open', (file: TFile) => {
             if (file !== null)
             {
-                //console.log("file-open: " + file.path);
-
-                if (this.settings.protectEnabled && !this.isConfirmPasswordCorrect && this.isProtectedFile(file)) {
+                if (this.settings.protectEnabled && !this.isVerifyPasswordCorrect && this.isProtectedFile(file)) {
                     // firstly close the file, then show the password dialog
                     this.closeLeaves(file);
-
-                    if (!this.isConfirmPasswordWaitting) {
-                        const setModal = new ConfirmPasswordModal(this.app, this, () => {
-                            if (!this.isConfirmPasswordCorrect) {
-                                //console.log("isConfirmPasswordCorrect is false");
-                            } else {
-                                //console.log("isConfirmPasswordCorrect is true");
-                                openLeaves(file);
-                                setIcon(this.enablePasswordRibbonIcon, "lock");
-                            }
-                        }).open();
-                    }
+                    this.ClosePasswordProtection(file);
                 }
             }
         }));
     }
 
     onunload() {
+    }
+
+    // open note
+    async openLeave(file: TFile | null) {
+        var leaf = this.app.workspace.getLeaf(false);
+        if (leaf != null && file != null) {
+            leaf.openFile(file);
+        }
     }
 
     // close notes
@@ -123,7 +105,6 @@ export default class PasswordPlugin extends Plugin {
                 }
 
                 if (needClose) {
-                    //console.log("file closed: " + leaf.view.file.path);
                     await emptyLeaf(leaf);
                     leaf.detach();
                 }
@@ -131,26 +112,54 @@ export default class PasswordPlugin extends Plugin {
         }
     }
 
-    // enable password protection
-    EnablePasswordProtection() {
-        if (!this.settings.protectEnabled) {
-            new Notice("Please set password in the Obsidian Password plugin first!");
-        } else {
-            if (this.isConfirmPasswordCorrect) {
-                this.isConfirmPasswordCorrect = false;
-                this.closeLeaves(null);
-                setIcon(this.enablePasswordRibbonIcon, "unlock");
+    // open or close password protection
+    switchPasswordProtection() {
+        if (this.settings.protectEnabled) {
+            if (!this.isVerifyPasswordCorrect) {
+                this.ClosePasswordProtection(null);
             } else {
-                this.closeLeaves(null);
+                this.OpenPasswordProtection();
             }
+        } else {
+            this.OpenPasswordProtection();
+        }
+    }
+
+    // open password protection
+    OpenPasswordProtection() {
+        if (!this.settings.protectEnabled) {
+            new Notice("Please set password in the Obsidian Password plugin firstly!");
+        } else {
+            if (this.isVerifyPasswordCorrect) {
+                this.isVerifyPasswordCorrect = false;
+            }
+            this.closeLeaves(null);
+            setIcon(this.passwordRibbonBtn, "unlock");
+            this.passwordRibbonBtn.ariaLabel = "Close password protection";
             new Notice("Password protection is opened!");
         }
     }
 
-    // disable password protection
-    DisablePasswordProtection() {
+    // close password protection
+    ClosePasswordProtection(file: TFile | null) {
         if (!this.settings.protectEnabled) {
-            setIcon(this.enablePasswordRibbonIcon, "lock");;
+            setIcon(this.passwordRibbonBtn, "lock");
+            this.passwordRibbonBtn.ariaLabel = "Open password protection";
+        } else {
+            if (!this.isVerifyPasswordCorrect) {
+                if (!this.isVerifyPasswordWaitting) {
+                    const setModal = new VerifyPasswordModal(this.app, this, () => {
+                        if (this.isVerifyPasswordCorrect) {
+                            if (file != null) {
+                                this.openLeave(file);
+                            }
+                            setIcon(this.passwordRibbonBtn, "lock");
+                            this.passwordRibbonBtn.ariaLabel = "Open password protection";
+                            new Notice("Password protection is closed!");
+                        }
+                    }).open();
+                }
+            }
         }
     }
 
@@ -174,18 +183,14 @@ export default class PasswordPlugin extends Plugin {
             protectedPath = protectedPath + '/';
         }
 
-        //console.log("protectedPath: " + protectedPath);
-        //console.log("filePath: " + filePath);
         if (filePath < protectedPath) {
-            //console.log("isProtectedFile return false: filePath < protectedPath");
             return false;
         }
 
         if (filePath.startsWith(this.settings.protectedPath)) {
-            //console.log("isProtectedFile return true: filePath startsWith protectedPath");
             return true;
         }
-        //console.log("isProtectedFile return false: filePath isn't contained protectedPath");
+
         return false;
     }
 
@@ -245,7 +250,6 @@ class PasswordSettingTab extends PluginSettingTab {
 
         containerEl.createEl('h2', {text: 'Settings for obsidian password plugin.'});
 
-        //console.log('protectEnabled: ' + this.plugin.settings.protectEnabled);
         new Setting(containerEl)
             .setName('The folder need to be protected')
             .setDesc('With relative path, the \'/\' is the root path of vault folder')
@@ -253,9 +257,8 @@ class PasswordSettingTab extends PluginSettingTab {
                 .setPlaceholder('Enter path')
                 .setValue(this.plugin.settings.protectedPath)
                 .onChange(async (value) => {
-                    //console.log('The folder will be protected: ' + value);
                     var path = value.toLowerCase();
-                    if (path[0] != '/') {
+                    if (path.length == 0 || path[0] != '/') {
                         path = '/' + path;
                     }
                     if (path[path.length - 1] != '/') {
@@ -279,20 +282,19 @@ class PasswordSettingTab extends PluginSettingTab {
                             this.plugin.settings.protectEnabled = false;
                             const setModal = new SetPasswordModal(this.app, this.plugin, () => {
                                 if (this.plugin.settings.protectEnabled) {
-                                    this.plugin.isConfirmPasswordCorrect = false;
                                     this.plugin.saveSettings();
-                                    this.plugin.EnablePasswordProtection();
+                                    this.plugin.OpenPasswordProtection();
                                 }
                                 this.display();
                             }).open();
                         } else {
                             //console.log('Disable the protection');
-                            if (!this.plugin.isConfirmPasswordWaitting) {
-                                const setModal = new ConfirmPasswordModal(this.app, this.plugin, () => {
-                                    if (this.plugin.isConfirmPasswordCorrect) {
+                            if (!this.plugin.isVerifyPasswordWaitting) {
+                                const setModal = new VerifyPasswordModal(this.app, this.plugin, () => {
+                                    if (this.plugin.isVerifyPasswordCorrect) {
                                         this.plugin.settings.protectEnabled = false;
                                         this.plugin.saveSettings();
-                                        this.plugin.DisablePasswordProtection();
+                                        this.plugin.ClosePasswordProtection(null);
                                     }
                                     this.display();
                                 }).open();
@@ -435,15 +437,15 @@ class SetPasswordModal extends Modal {
     }
 }
 
-class ConfirmPasswordModal extends Modal {
+class VerifyPasswordModal extends Modal {
     plugin: PasswordPlugin;
     onSubmit: () => void;
 
     constructor(app: App, plugin: PasswordPlugin, onSubmit: () => void) {
         super(app);
         this.plugin = plugin;
-        this.plugin.isConfirmPasswordWaitting = true;
-        this.plugin.isConfirmPasswordCorrect = false;
+        this.plugin.isVerifyPasswordWaitting = true;
+        this.plugin.isVerifyPasswordCorrect = false;
         this.onSubmit = onSubmit;
     }
 
@@ -455,7 +457,7 @@ class ConfirmPasswordModal extends Modal {
         const titleEl = contentEl.createDiv();
         titleEl.style.fontWeight = 'bold';
         titleEl.style.marginBottom = '1em';
-        titleEl.setText('Confirm password');
+        titleEl.setText('Verify password');
 
         // make a div for user's password input
         const inputPwContainerEl = contentEl.createDiv();
@@ -468,7 +470,7 @@ class ConfirmPasswordModal extends Modal {
         //message modal - to fire if either input is empty
         const messageEl = contentEl.createDiv();
         messageEl.style.marginBottom = '1em';
-        messageEl.setText('Please enter you password to confirm.');
+        messageEl.setText('Please enter you password to verify.');
         messageEl.show();
 
         // make a div for save and cancel button
@@ -481,7 +483,7 @@ class ConfirmPasswordModal extends Modal {
 
         pwInputEl.addEventListener('input', (event) => {
             messageEl.style.color = '';
-            messageEl.setText('Please enter you password to confirm.');
+            messageEl.setText('Please enter you password to verify.');
         });
 
         // check the confirm input
@@ -528,7 +530,7 @@ class ConfirmPasswordModal extends Modal {
             }
 
             // if all checks pass, save to settings
-            this.plugin.isConfirmPasswordCorrect = true;
+            this.plugin.isVerifyPasswordCorrect = true;
             this.close();
         }
 
@@ -546,7 +548,7 @@ class ConfirmPasswordModal extends Modal {
     }
 
     onClose() {
-        this.plugin.isConfirmPasswordWaitting = false;
+        this.plugin.isVerifyPasswordWaitting = false;
         const { contentEl } = this;
         contentEl.empty();
         this.onSubmit();
