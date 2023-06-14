@@ -52,7 +52,7 @@ var PasswordPlugin = class extends import_obsidian.Plugin {
       });
     }
     this.addCommand({
-      id: "Obsidian password: Open password protection",
+      id: "Password: Open password protection",
       name: "Open password protection",
       callback: () => {
         this.OpenPasswordProtection();
@@ -124,7 +124,7 @@ var PasswordPlugin = class extends import_obsidian.Plugin {
   // open password protection
   OpenPasswordProtection() {
     if (!this.settings.protectEnabled) {
-      new import_obsidian.Notice("Please set password in the Obsidian Password plugin firstly!");
+      new import_obsidian.Notice("Please firstly set password in the setting of Password Protection plugin!");
     } else {
       if (this.isVerifyPasswordCorrect) {
         this.isVerifyPasswordCorrect = false;
@@ -228,7 +228,7 @@ var PasswordSettingTab = class extends import_obsidian.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Settings for obsidian password plugin." });
+    containerEl.createEl("h2", { text: "Settings for Password Protection plugin." });
     new import_obsidian.Setting(containerEl).setName("The folder need to be protected").setDesc("With relative path, the '/' is the root path of vault folder").addText((text) => text.setPlaceholder("Enter path").setValue(this.plugin.settings.protectedPath).onChange(async (value) => {
       var path = value.toLowerCase();
       if (path.length == 0 || path[0] != "/") {

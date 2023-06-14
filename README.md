@@ -2,7 +2,7 @@
 
 ### Purpose
 
-I developed this plugin to prevent my girlfriend from reading my private notes or diaries.  
+I developed this plugin to prevent my girlfriend from peeking my private notes or diaries.  
 
 For a person familiar with Obsidian, this plugin is useless, because he can easily disable this plugin, but for my girlfriend, this plugin serves my purpose.  
 
@@ -12,11 +12,13 @@ No encrypt, no decrypt, This plugin doesn't modify your notes, it will not do an
 
 After you enable it, when you open a note, if the folder path of the note matches the path of the protected folder that you set, a password verification box will pop up, and you can only continue to open the note if you enter the correct password.  
 
-Once you have entered the correct password once, you will not be asked to enter it again when opening other protected files.  
+If you set the protected folder path to the root path (/), when you launch Obsidian, a password verification box will present, enter the correct password, you can just open a note.  
 
-If you want to turn protection on again, you can go to the command panel, type "pass", find the command: Open password protection, run it, and then to open the protected file, the password verification box will pop up again.  
+Once you have entered the correct password, you will not be asked to enter it again when opening other protected files.  
 
-In Obsidian for Windows, a Password Protection Button appears on the left-bar. Click on it to switch between protected and unprotected status.
+If you want to turn protection on again, you can go to the command panel, type "pass", find the command: Open password protection, run it, when you open a protected note, the password verification box will pop up again.  
+
+In Obsidian for Windows, a Password Protection Button locates on the left-bar. Click on it to execute protecting or unprotecting action.
 
 ------  
 
@@ -34,11 +36,13 @@ In Obsidian for Windows, a Password Protection Button appears on the left-bar. C
 
 在你启用它后，当你打开一篇笔记，如果笔记所在的文件夹路径，和你设置的受保护文件夹路径匹配，将会弹出一个密码验证框，只有输入正确的密码，你才能继续打开这篇笔记。
 
-一旦输入过一次正确的密码，打开其他受保护的文件时，不会要求再次输入。
+如果你设置的受保护文件夹路径是根路径（/），那么，当你启动 Obsidian，你就会看到一个密码验证框，只有输入正确的密码，你才能打开任何一篇笔记。
+
+一旦输入过一次正确的密码，那么再打开其他受保护的文件时，不会要求再次输入。
 
 如果你想再次开启保护，可以调出命令面板，输入“pass”，找到命令：Open password protection，执行它，那么再要打开受保护的文件，会再次弹出密码验证框。
 
-在 Windows 版的 Obsidian 里，左侧的工具栏会出现一个密码保护按钮，点击它也可以切换保护或不保护状态。
+在 Windows 版的 Obsidian 里，左侧的工具栏会出现一个密码保护按钮，点击它也可以执行保护或不保护动作。
 
 ------  
 

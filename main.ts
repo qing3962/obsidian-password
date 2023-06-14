@@ -39,7 +39,7 @@ export default class PasswordPlugin extends Plugin {
 
         // This adds a simple command that can be triggered anywhere
         this.addCommand({
-            id: 'Obsidian password: Open password protection',
+            id: 'Password: Open password protection',
             name: 'Open password protection',
             callback: () => {
                 this.OpenPasswordProtection();
@@ -128,7 +128,7 @@ export default class PasswordPlugin extends Plugin {
     // open password protection
     OpenPasswordProtection() {
         if (!this.settings.protectEnabled) {
-            new Notice("Please set password in the Obsidian Password plugin firstly!");
+            new Notice("Please firstly set password in the setting of Password Protection plugin!");
         } else {
             if (this.isVerifyPasswordCorrect) {
                 this.isVerifyPasswordCorrect = false;
@@ -248,7 +248,7 @@ class PasswordSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        containerEl.createEl('h2', {text: 'Settings for obsidian password plugin.'});
+        containerEl.createEl('h2', {text: 'Settings for Password Protection plugin.'});
 
         new Setting(containerEl)
             .setName('The folder need to be protected')

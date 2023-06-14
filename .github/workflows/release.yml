@@ -1,4 +1,4 @@
-name: Release Obsidian plugin
+name: Release password-protection plugin
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - "*"
 
 env:
-  PLUGIN_NAME: obsidian-password # Change this to match the id of your plugin.
+  PLUGIN_NAME: password-protection # Change this to match the id of your plugin.
 
 jobs:
   build:
